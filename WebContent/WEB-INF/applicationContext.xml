@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   		http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/util
+	   		http://www.springframework.org/schema/util/spring-util.xsd
+	   		http://www.springframework.org/schema/aop
+	   		http://www.springframework.org/schema/aop/spring-aop.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+	   		http://www.springframework.org/schema/tx
+	   		http://www.springframework.org/schema/tx/spring-tx.xsd
+	   		">
+		
+		<!-- @Required | @PostConstruct - init |@AutoWired -->
+		<context:annotation-config/>
+		
+		<!-- 
+			This component scan performs its usual scan for all our @Service @Repository
+			and @Component in the specified package
+			The exclude filter is aset up to skip @Controller
+			Spring reference document details of the other exclue filter types
+		 -->
+		<context:component-scan base-package="com.buy_from_us" use-default-filters="true">
+			<context:exclude-filter 
+				type="annotation" 
+				expression="org.springframework.stereotype.Controller"/>
+		</context:component-scan>
+		
+		
+		<tx:annotation-driven/>
+	
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost/shoppingcarttest" />
+		<property name="username" value="root" />
+		<property name="password" value="" />
+	</bean>			
+		
+	<bean name="sessionFactory"
+	class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+	<property name="dataSource" ref="dataSource"/>
+	<property name="hibernateProperties">
+		<props>
+			<prop key="hibernate.dialect">
+				org.hibernate.dialect.MySQL5InnoDBDialect
+			</prop>
+			<!-- validate| update| create| create - drop -->
+			<!-- .update will destroy everything -->
+			<prop key="hibernate.hbm2ddl.auto"> <!-- .update, for table not created error -->
+				update <!-- create | update -->
+			</prop>
+			<prop key="hibernate.show_sql">true</prop>
+			<prop key="hibernate.cache.provide_class">
+				org.hibernate.cache.NoCacheProvider
+			</prop>
+		</props>
+	</property>
+	
+	<property name="annotatedClasses">
+		<list>
+			<value>com.buy_from_us.model.Account</value>
+			<value>com.buy_from_us.model.Category</value>
+			<value>com.buy_from_us.model.Product</value>
+			<value>com.buy_from_us.model.Order</value>
+			<value>com.buy_from_us.model.OrderDetail</value>
+		</list>
+	</property>
+	</bean>	
+	
+	<bean name="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+			<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+		
+	
+	<!--  
+	<bean id="dataComponent" class="com.example.DemoHibernateAccess">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>-->
+	
+	<!--  	
+	<bean id = "accountDao" class="com.buy_from_us.dao.AccountDao">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    
+    -->	
+		
+</beans>
